@@ -1,0 +1,21 @@
+{
+  "name": "sentify-v2",
+  "version": "1.0.0",
+  "description": "Sentiment analysis app with Python backend and Next.js frontend",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && python3 -m uvicorn api.index:app --reload --port 8000 --host 0.0.0.0",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && python3 -m pip install -r requirements.txt",
+    "build": "cd frontend && npm run build",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && python3 -m uvicorn api.index:app --port 8000 --host 0.0.0.0",
+    "start:frontend": "cd frontend && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["sentiment-analysis", "fastapi", "nextjs", "vercel"],
+  "author": "Your Name",
+  "license": "MIT"
+} 

@@ -1,6 +1,8 @@
 import os
 import re
+import time
 from typing import List, Dict, Any
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from huggingface_hub import InferenceClient
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
@@ -52,6 +54,69 @@ class HuggingFaceSentimentService:
             
         except Exception as e:
             return self._fallback_analysis(text)
+    
+    def classify_sentiment_batch(self, text: str) -> tuple:
+        """
+        Function to call sentiment analysis for batch processing
+        """
+        try:
+            result = self.client.text_classification(
+                text,
+                model=self.model,
+            )
+            return text, result
+        except Exception as e:
+            return text, f"Error: {e}"
+    
+    def analyze_sentiment_batch(self, texts: List[str]) -> List[Dict[str, Any]]:
+        """
+        Analyze sentiment for multiple texts in parallel batches
+        """
+        start_time = time.time()
+        
+        results = []
+        with ThreadPoolExecutor(max_workers=500) as executor:
+            future_to_text = {executor.submit(self.classify_sentiment_batch, text): text for text in texts}
+            
+            for i, future in enumerate(as_completed(future_to_text)):
+                text, result = future.result()
+                
+                # Process the result
+                if isinstance(result, str) and result.startswith("Error:"):
+                    # Fallback analysis for errors
+                    processed_result = self._fallback_analysis(text)
+                else:
+                    # Process Hugging Face result
+                    positive_score = 0.0
+                    negative_score = 0.0
+                    
+                    for item in result:
+                        if isinstance(item, dict):
+                            label = item.get("label", "")
+                            score = item.get("score", 0.0)
+                            if label == 'POSITIVE':
+                                positive_score = float(score)
+                            elif label == 'NEGATIVE':
+                                negative_score = float(score)
+                    
+                    if positive_score > negative_score:
+                        sentiment = "positive"
+                        confidence = positive_score
+                    else:
+                        sentiment = "negative"
+                        confidence = negative_score
+                    
+                    processed_result = {
+                        "text": text,
+                        "sentiment": sentiment,
+                        "confidence": confidence,
+                        "positive_score": positive_score,
+                        "negative_score": negative_score
+                    }
+                
+                results.append(processed_result)
+        
+        return results
     
     def _fallback_analysis(self, text: str) -> Dict[str, Any]:
         """Fallback to basic keyword analysis"""

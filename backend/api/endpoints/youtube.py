@@ -12,6 +12,7 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
     """
     Analyze sentiment of YouTube video comments
     """
+
     
     try:
         # Extract video ID
@@ -19,20 +20,20 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
         
         # Get comments
         comments = youtube_service.get_comments(video_id)
-        
         if not comments:
             raise HTTPException(status_code=404, detail="No comments found for this video")
         
-        # Analyze sentiment for each comment
+        # Analyze sentiment for all comments in batch
+        sentiment_results = sentiment_service.analyze_sentiment_batch(comments)
+        
+        # Process results
         comment_sentiments = []
         positive_count = 0
         negative_count = 0
-        
-        for comment in comments:
-            result = sentiment_service.analyze_sentiment(comment)
-            
+
+        for result in sentiment_results:
             comment_sentiment = CommentSentiment(
-                text=comment,
+                text=result['text'],
                 sentiment=result['sentiment'],
                 confidence=result['confidence'],
                 positive_score=result['positive_score'],

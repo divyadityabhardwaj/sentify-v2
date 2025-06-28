@@ -24,7 +24,7 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
             raise HTTPException(status_code=404, detail="No comments found for this video")
         
         # Analyze sentiment for all comments in batch
-        sentiment_results = sentiment_service.analyze_sentiment_batch(comments)
+        sentiment_results, successful_count, failed_count = sentiment_service.analyze_sentiment_batch(comments)
         
         # Process results
         comment_sentiments = []
@@ -46,10 +46,11 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
             else:
                 negative_count += 1
         
-        # Calculate percentages
-        total_comments = len(comment_sentiments)
-        positive_percentage = (positive_count / total_comments) * 100
-        negative_percentage = (negative_count / total_comments) * 100
+        # Calculate percentages based on processed comments only
+        processed_comments = len(comment_sentiments)
+        positive_percentage = (positive_count / processed_comments) * 100 if processed_comments > 0 else 0
+        negative_percentage = (negative_count / processed_comments) * 100 if processed_comments > 0 else 0
+        
         
         # Get top positive and negative comments
         positive_comments = [c for c in comment_sentiments if c.sentiment == 'positive']
@@ -59,10 +60,11 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
         top_positive = sorted(positive_comments, key=lambda x: x.confidence, reverse=True)[:5]
         top_negative = sorted(negative_comments, key=lambda x: x.confidence, reverse=True)[:5]
         
-        
         return YouTubeAnalysisResponse(
             video_id=video_id,
-            total_comments=total_comments,
+            total_comments=len(comments),
+            processed_comments=successful_count,
+            failed_comments=failed_count,
             positive_count=positive_count,
             negative_count=negative_count,
             positive_percentage=positive_percentage,

@@ -53,7 +53,7 @@ class HuggingFaceSentimentService:
             }
             
         except Exception as e:
-            return self._fallback_analysis(text)
+            raise e
     
     def classify_sentiment_batch(self, text: str) -> tuple:
         """
@@ -68,13 +68,16 @@ class HuggingFaceSentimentService:
         except Exception as e:
             return text, f"Error: {e}"
     
-    def analyze_sentiment_batch(self, texts: List[str]) -> List[Dict[str, Any]]:
+    def analyze_sentiment_batch(self, texts: List[str]) -> tuple[List[Dict[str, Any]], int, int]:
         """
         Analyze sentiment for multiple texts in parallel batches
         """
         start_time = time.time()
         
         results = []
+        successful_count = 0
+        failed_count = 0
+        
         with ThreadPoolExecutor(max_workers=500) as executor:
             future_to_text = {executor.submit(self.classify_sentiment_batch, text): text for text in texts}
             
@@ -83,10 +86,12 @@ class HuggingFaceSentimentService:
                 
                 # Process the result
                 if isinstance(result, str) and result.startswith("Error:"):
-                    # Fallback analysis for errors
-                    processed_result = self._fallback_analysis(text)
+                    # Skip failed API calls - don't include in results
+                    failed_count += 1
+                    continue
                 else:
                     # Process Hugging Face result
+                    successful_count += 1
                     positive_score = 0.0
                     negative_score = 0.0
                     
@@ -113,44 +118,10 @@ class HuggingFaceSentimentService:
                         "positive_score": positive_score,
                         "negative_score": negative_score
                     }
-                
-                results.append(processed_result)
+                    
+                    results.append(processed_result)
         
-        return results
-    
-    def _fallback_analysis(self, text: str) -> Dict[str, Any]:
-        """Fallback to basic keyword analysis"""
-        text_lower = text.lower()
-        
-        positive_words = ["good", "great", "excellent", "amazing", "wonderful", "love", "happy"]
-        negative_words = ["bad", "terrible", "awful", "hate", "sad", "angry", "disappointed"]
-        
-        positive_count = sum(1 for word in positive_words if word in text_lower)
-        negative_count = sum(1 for word in negative_words if word in text_lower)
-        
-        if positive_count > negative_count:
-            sentiment = "positive"
-            confidence = min(0.9, 0.5 + (positive_count * 0.1))
-            positive_score = confidence
-            negative_score = 1 - confidence
-        elif negative_count > positive_count:
-            sentiment = "negative"
-            confidence = min(0.9, 0.5 + (negative_count * 0.1))
-            negative_score = confidence
-            positive_score = 1 - confidence
-        else:
-            sentiment = "neutral"
-            confidence = 0.5
-            positive_score = 0.5
-            negative_score = 0.5
-        
-        return {
-            "text": text,
-            "sentiment": sentiment,
-            "confidence": confidence,
-            "positive_score": positive_score,
-            "negative_score": negative_score
-        }
+        return results, successful_count, failed_count
 
 class YouTubeService:
     def __init__(self):
@@ -169,14 +140,16 @@ class YouTubeService:
     
     def get_comments(self, video_id: str) -> List[str]:
         """Get comments from YouTube video"""
+        start_time = time.time()
         comments = []
         try:
             response = self.youtube.commentThreads().list(
                 part='snippet',
                 videoId=video_id,
                 textFormat='plainText',
-                # maxResults=max_results
+                maxResults=100
             ).execute()
+
 
             for item in response['items']:
                 comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
@@ -184,12 +157,13 @@ class YouTubeService:
 
 
             # Handle pagination
-            while 'nextPageToken' in response and len(comments):
+            while 'nextPageToken' in response:
                 response = self.youtube.commentThreads().list(
                     part='snippet',
                     videoId=video_id,
                     textFormat='plainText',
-                    pageToken=response['nextPageToken']
+                    pageToken=response['nextPageToken'],
+                    maxResults=100
                 ).execute()
                 for item in response['items']:
                     comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
@@ -197,5 +171,9 @@ class YouTubeService:
 
         except Exception as e:
             raise e
+
+        
+        # Sort comments for consistency between runs
+        comments.sort()
 
         return comments 

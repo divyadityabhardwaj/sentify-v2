@@ -28,6 +28,8 @@ class CommentSentiment(BaseModel):
 class YouTubeAnalysisResponse(BaseModel):
     video_id: str
     total_comments: int
+    processed_comments: int
+    failed_comments: int
     positive_count: int
     negative_count: int
     positive_percentage: float

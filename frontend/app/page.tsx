@@ -26,6 +26,8 @@ interface CommentSentiment {
 interface YouTubeAnalysisResult {
   video_id: string;
   total_comments: number;
+  processed_comments: number;
+  failed_comments: number;
   positive_count: number;
   negative_count: number;
   positive_percentage: number;
@@ -341,14 +343,47 @@ export default function Home() {
                   </h3>
 
                   <div className="space-y-6">
+                    {/* Processing Stats */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h4 className="text-md font-semibold text-blue-800 mb-2">
+                        Processing Statistics
+                      </h4>
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                          <div className="text-lg font-bold text-blue-600">
+                            {youtubeResult.total_comments}
+                          </div>
+                          <div className="text-sm text-blue-700">
+                            Total Comments
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-bold text-green-600">
+                            {youtubeResult.processed_comments}
+                          </div>
+                          <div className="text-sm text-green-700">
+                            Successfully Processed
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-bold text-red-600">
+                            {youtubeResult.failed_comments}
+                          </div>
+                          <div className="text-sm text-red-700">
+                            Failed to Process
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Summary Stats */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="bg-white p-4 rounded-lg text-center">
                         <div className="text-2xl font-bold text-blue-600">
-                          {youtubeResult.total_comments}
+                          {youtubeResult.processed_comments}
                         </div>
                         <div className="text-sm text-gray-600">
-                          Total Comments
+                          Analyzed Comments
                         </div>
                       </div>
                       <div className="bg-white p-4 rounded-lg text-center">

@@ -112,6 +112,7 @@ export default function YouTubeAnalysis() {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />
+
           <motion.button
             onClick={analyzeYouTubeComments}
             disabled={loading}
@@ -132,6 +133,12 @@ export default function YouTubeAnalysis() {
             )}
           </motion.button>
         </div>
+        <label
+          htmlFor="youtube-url"
+          className="block text-sm font-medium text-gray-300 mb-2 mt-4"
+        >
+          *Videos with more than 1000 comments may take longer to analyze
+        </label>
       </div>
 
       {result && (

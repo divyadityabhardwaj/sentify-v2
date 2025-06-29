@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   async rewrites() {
     // In production (Vercel), API calls go to the same domain
     // In development, they go to the backend URL

@@ -34,6 +34,5 @@ class YouTubeAnalysisResponse(BaseModel):
     negative_count: int
     positive_percentage: float
     negative_percentage: float
-    comments: List[CommentSentiment]
     top_positive_comments: List[CommentSentiment]
     top_negative_comments: List[CommentSentiment] 

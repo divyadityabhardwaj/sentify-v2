@@ -26,8 +26,9 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
         # Analyze sentiment for all comments in batch
         sentiment_results, successful_count, failed_count = sentiment_service.analyze_sentiment_batch(comments)
         
-        # Process results
-        comment_sentiments = []
+        # Process results and separate positive/negative comments
+        positive_comments = []
+        negative_comments = []
         positive_count = 0
         negative_count = 0
 
@@ -39,24 +40,20 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
                 positive_score=result['positive_score'],
                 negative_score=result['negative_score']
             )
-            comment_sentiments.append(comment_sentiment)
             
             if result['sentiment'] == 'positive':
+                positive_comments.append(comment_sentiment)
                 positive_count += 1
             else:
+                negative_comments.append(comment_sentiment)
                 negative_count += 1
         
         # Calculate percentages based on processed comments only
-        processed_comments = len(comment_sentiments)
+        processed_comments = len(sentiment_results)
         positive_percentage = (positive_count / processed_comments) * 100 if processed_comments > 0 else 0
         negative_percentage = (negative_count / processed_comments) * 100 if processed_comments > 0 else 0
         
-        
-        # Get top positive and negative comments
-        positive_comments = [c for c in comment_sentiments if c.sentiment == 'positive']
-        negative_comments = [c for c in comment_sentiments if c.sentiment == 'negative']
-        
-        # Sort by confidence and get top 5
+        # Sort by confidence and get top 5 for each category
         top_positive = sorted(positive_comments, key=lambda x: x.confidence, reverse=True)[:5]
         top_negative = sorted(negative_comments, key=lambda x: x.confidence, reverse=True)[:5]
         
@@ -69,7 +66,6 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
             negative_count=negative_count,
             positive_percentage=positive_percentage,
             negative_percentage=negative_percentage,
-            comments=comment_sentiments,
             top_positive_comments=top_positive,
             top_negative_comments=top_negative
         )

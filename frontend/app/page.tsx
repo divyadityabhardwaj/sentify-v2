@@ -227,7 +227,7 @@ export default function Home() {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="flex justify-center mb-8"
           >
-            <div className="bg-slate-800 rounded-lg p-1 border border-purple-500/20">
+            <div className="bg-slate-800 rounded-lg p-1 border border-purple-500/20 flex">
               <button
                 onClick={() => setActiveTab("text")}
                 className={`px-6 py-3 rounded-md font-medium transition-all duration-300 flex items-center gap-2 ${

@@ -65,7 +65,20 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <div className="flex justify-center mb-4">
+            <img
+              src="/3gXp (1).gif"
+              alt="Loading animation"
+              style={{
+                width: "200px",
+                height: "200px",
+                background: "transparent",
+                border: "none",
+                outline: "none",
+                filter: "grayscale(100%) brightness(0.8) contrast(.8)",
+              }}
+            />
+          </div>
           <h2 className="text-2xl font-semibold text-white mb-2">
             Awakening Sentify...
           </h2>

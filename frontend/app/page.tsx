@@ -60,28 +60,7 @@ export default function Home() {
     }, 100);
   };
 
-  if (backendStatus === "checking") {
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-center">
-          <div className="flex justify-center mb-6">
-            <div className="relative">
-              <div className="w-20 h-20 border-4 border-[#2a2a2a] border-t-[#3b82f6] rounded-full animate-spin"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Brain className="w-8 h-8 text-[#3b82f6]" />
-              </div>
-            </div>
-          </div>
-          <h2 className="text-2xl font-semibold text-white mb-2 animate-fade-in-up">
-            Initializing Sentify...
-          </h2>
-          <p className="text-[#a0a0a0] animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Preparing AI sentiment analysis
-          </p>
-        </div>
-      </div>
-    );
-  }
+
 
   if (backendStatus === "error") {
     return (
@@ -183,7 +162,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              Advanced VADER-powered sentiment analysis for text and YouTube
+              Advanced RoBERTa-powered sentiment analysis for text and YouTube
               comments. Fast, accurate, and completely free.
             </motion.p>
             
@@ -306,7 +285,7 @@ export default function Home() {
             className="mt-16 text-center text-sm text-[#6b6b6b]"
           >
             <p>
-              Powered by VADER Sentiment Analysis & YouTube API • Built with Next.js & FastAPI
+              Powered by RoBERTa Sentiment Analysis & YouTube API • Built with Next.js & FastAPI
             </p>
           </motion.div>
         </div>

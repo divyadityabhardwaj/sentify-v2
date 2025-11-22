@@ -108,7 +108,7 @@ export default function TextAnalysis() {
         >
           {loading ? (
             <>
-              <img src="/running.gif" alt="Running..." className="w-8 h-8" />
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               Analyzing...
             </>
           ) : (

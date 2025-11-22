@@ -59,7 +59,7 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
         negative_percentage = (negative_count / processed_comments) * 100 if processed_comments > 0 else 0
         neutral_percentage = (neutral_count / processed_comments) * 100 if processed_comments > 0 else 0
         
-        # Sort by compound score for better ranking (VADER's compound score is perfect for this)
+        # Sort by compound score for better ranking
         # For positive: highest compound scores first
         # For negative: lowest compound scores first
         all_results_with_compound = []

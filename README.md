@@ -6,7 +6,7 @@ A powerful sentiment analysis application with **Hugging Face AI models** and **
 
 ### 🧠 **Advanced Sentiment Analysis**
 
-- **VADER Sentiment Analysis**: Valence Aware Dictionary and sEntiment Reasoner
+- **RoBERTa Sentiment Analysis**: Robustly optimized BERT approach for state-of-the-art accuracy
 - **Lightning Fast**: Processes 1000s of texts per second locally
 - **High Accuracy**: 85-90% accuracy, optimized for social media text
 - **Real-time Processing**: Instant analysis with confidence scores
@@ -46,7 +46,7 @@ sentify-v2/
 │   │   │   ├── sentiment.py # Text sentiment analysis
 │   │   │   └── youtube.py # YouTube comment analysis
 │   │   ├── services/      # Business logic services
-│   │   │   └── sentiment_service.py # VADER & YouTube services
+│   │   │   └── sentiment_service.py # RoBERTa & YouTube services
 │   │   ├── models.py      # Pydantic data models
 │   │   └── index.py       # Main FastAPI app
 │   └── requirements.txt   # Python dependencies
@@ -85,7 +85,7 @@ YOUTUBE_API_KEY=your_youtube_api_key_here
 BACKEND_URL=http://localhost:8000
 ```
 
-**Note**: No Hugging Face API key needed! VADER runs locally.
+**Note**: No Hugging Face API key needed! RoBERTa runs locally.
 
 ### 3. Install Dependencies
 
@@ -120,7 +120,7 @@ chmod +x start-dev.sh
 
 ### ~~Hugging Face API Key~~ (No Longer Needed!)
 
-We now use VADER for sentiment analysis, which runs locally and requires no API key!
+We now use RoBERTa for sentiment analysis, which runs locally and requires no API key!
 
 ## 📊 API Endpoints
 
@@ -225,7 +225,7 @@ Output:
 
 **"Sentiment analysis error"**
 
-- VADER runs locally, so no API issues
+- RoBERTa runs locally, so no API issues
 - Check if text is valid and not empty
 - Ensure backend is running properly
 
@@ -257,7 +257,7 @@ Output:
 
 ## 🙏 Acknowledgments
 
-- **VADER Sentiment Analysis** for the fast, accurate local sentiment analysis
+- **RoBERTa Sentiment Analysis** for state-of-the-art, context-aware sentiment analysis
 - **YouTube Data API** for comment extraction
 - **FastAPI** for the robust backend framework
 - **Next.js** for the modern frontend framework

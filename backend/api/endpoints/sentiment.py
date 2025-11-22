@@ -8,7 +8,7 @@ sentiment_service = RobertaSentimentService()
 @router.post("/sentiment", response_model=SentimentResponse)
 async def analyze_sentiment(request: SentimentRequest):
     """
-    Analyze sentiment of the provided text using VADER
+    Analyze sentiment of the provided text using RoBERTa
     """
     
     try:

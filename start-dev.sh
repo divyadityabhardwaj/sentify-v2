@@ -29,7 +29,7 @@ sleep 2
 
 # Start frontend
 echo -e "${GREEN}⚛️  Starting Next.js Frontend on port 3000...${NC}"
-cd ../frontend && npm run dev &
+cd frontend && npm run dev &
 FRONTEND_PID=$!
 
 echo ""

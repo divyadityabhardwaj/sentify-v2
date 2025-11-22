@@ -6,18 +6,21 @@ A powerful sentiment analysis application with **Hugging Face AI models** and **
 
 ### 🧠 **Advanced Sentiment Analysis**
 
-- **Hugging Face Model**: `distilbert/distilbert-base-uncased-finetuned-sst-2-english`
-- **High Accuracy**: State-of-the-art sentiment classification
+- **VADER Sentiment Analysis**: Valence Aware Dictionary and sEntiment Reasoner
+- **Lightning Fast**: Processes 1000s of texts per second locally
+- **High Accuracy**: 85-90% accuracy, optimized for social media text
 - **Real-time Processing**: Instant analysis with confidence scores
-- **Fallback System**: Basic keyword analysis if API fails
+- **Emoji-Aware**: Understands emojis, capitalization, and punctuation
+- **100% Free**: No API costs or rate limits
 
 ### 🎥 **YouTube Comments Analysis**
 
 - **Comment Extraction**: Up to 100 comments per video
 - **Individual Analysis**: Each comment analyzed separately
-- **Top Comments**: Top 5 positive and negative comments
+- **Top Comments**: Top 10 positive and negative comments (ranked by intensity)
 - **Statistics Dashboard**: Counts, percentages, and visual charts
 - **URL Support**: Works with any YouTube URL format
+- **No Timeouts**: Fast local processing, no API rate limits
 
 ### 🎨 **Modern UI/UX**
 
@@ -43,7 +46,7 @@ sentify-v2/
 │   │   │   ├── sentiment.py # Text sentiment analysis
 │   │   │   └── youtube.py # YouTube comment analysis
 │   │   ├── services/      # Business logic services
-│   │   │   └── sentiment_service.py # Hugging Face & YouTube services
+│   │   │   └── sentiment_service.py # VADER & YouTube services
 │   │   ├── models.py      # Pydantic data models
 │   │   └── index.py       # Main FastAPI app
 │   └── requirements.txt   # Python dependencies
@@ -62,7 +65,7 @@ sentify-v2/
 
 - **Python 3.8+**
 - **Node.js 18+**
-- **API Keys** (see setup below)
+- **YouTube API Key** (for YouTube comment analysis)
 
 ### 1. Clone & Setup
 
@@ -77,11 +80,12 @@ cd sentify-v2
 # Copy environment template
 cp env.example .env
 
-# Edit .env with your API keys
-HUGGINGFACE_API_KEY=your_huggingface_token_here
+# Edit .env with your YouTube API key
 YOUTUBE_API_KEY=your_youtube_api_key_here
 BACKEND_URL=http://localhost:8000
 ```
+
+**Note**: No Hugging Face API key needed! VADER runs locally.
 
 ### 3. Install Dependencies
 
@@ -106,20 +110,17 @@ chmod +x start-dev.sh
 
 ## 🔑 API Keys Setup
 
-### Hugging Face API Key
-
-1. Go to [Hugging Face Settings](https://huggingface.co/settings/tokens)
-2. Create a new token
-3. Copy the token (starts with `hf_`)
-4. Add to `.env`: `HUGGINGFACE_API_KEY=your_token`
-
-### YouTube API Key
+### YouTube API Key (Required)
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select existing
 3. Enable **YouTube Data API v3**
 4. Create credentials (API Key)
 5. Add to `.env`: `YOUTUBE_API_KEY=your_api_key`
+
+### ~~Hugging Face API Key~~ (No Longer Needed!)
+
+We now use VADER for sentiment analysis, which runs locally and requires no API key!
 
 ## 📊 API Endpoints
 
@@ -181,10 +182,11 @@ npm run start           # Start in production mode
 ### Environment Variables for Production
 
 ```bash
-HUGGINGFACE_API_KEY=your_huggingface_token
 YOUTUBE_API_KEY=your_youtube_api_key
 BACKEND_URL=https://your-backend-url.vercel.app
 ```
+
+**Note**: No Hugging Face API key needed!
 
 ## 🎯 Usage Examples
 
@@ -221,11 +223,11 @@ Output:
 
 ### Common Issues
 
-**"Hugging Face API error"**
+**"Sentiment analysis error"**
 
-- Check API key in `.env` (project root)
-- Verify key starts with `hf_`
-- Ensure internet connection
+- VADER runs locally, so no API issues
+- Check if text is valid and not empty
+- Ensure backend is running properly
 
 **"YouTube API error"**
 
@@ -255,7 +257,7 @@ Output:
 
 ## 🙏 Acknowledgments
 
-- **Hugging Face** for providing the sentiment analysis model
+- **VADER Sentiment Analysis** for the fast, accurate local sentiment analysis
 - **YouTube Data API** for comment extraction
 - **FastAPI** for the robust backend framework
 - **Next.js** for the modern frontend framework

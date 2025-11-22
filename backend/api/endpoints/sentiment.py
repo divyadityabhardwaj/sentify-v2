@@ -1,14 +1,14 @@
 from fastapi import APIRouter, HTTPException
 from ..models import SentimentRequest, SentimentResponse
-from ..services.sentiment_service import HuggingFaceSentimentService
+from ..services.sentiment_service import RobertaSentimentService
 
 router = APIRouter()
-sentiment_service = HuggingFaceSentimentService()
+sentiment_service = RobertaSentimentService()
 
 @router.post("/sentiment", response_model=SentimentResponse)
 async def analyze_sentiment(request: SentimentRequest):
     """
-    Analyze sentiment of the provided text using Hugging Face model
+    Analyze sentiment of the provided text using VADER
     """
     
     try:

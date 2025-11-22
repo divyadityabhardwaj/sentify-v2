@@ -2,125 +2,123 @@ import os
 import re
 import time
 from typing import List, Dict, Any
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from huggingface_hub import InferenceClient
+from transformers import pipeline
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
 
 # Load .env from parent directory (project root)
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '..', '..', '.env'))
 
-class HuggingFaceSentimentService:
+class RobertaSentimentService:
+    """
+    RoBERTa (Robustly optimized BERT approach) Sentiment Analysis Service
+    Uses 'cardiffnlp/twitter-roberta-base-sentiment' model which is trained on ~58M tweets.
+    
+    Labels:
+    LABEL_0 -> Negative
+    LABEL_1 -> Neutral
+    LABEL_2 -> Positive
+    """
+    
     def __init__(self):
-        self.client = InferenceClient(
-            model="distilbert/distilbert-base-uncased-finetuned-sst-2-english",
-            token=os.getenv("HUGGINGFACE_API_KEY")
+        print("Loading RoBERTa model... this may take a moment")
+        self.sentiment_pipeline = pipeline(
+            "sentiment-analysis",
+            model="cardiffnlp/twitter-roberta-base-sentiment",
+            tokenizer="cardiffnlp/twitter-roberta-base-sentiment",
+            top_k=None  # Return scores for all labels
         )
-        self.model = "distilbert/distilbert-base-uncased-finetuned-sst-2-english"
+    
+    def _process_scores(self, scores_list: List[Dict[str, float]]) -> Dict[str, Any]:
+        """Helper to process raw model scores into our format"""
+        # Convert list of dicts to a single dict mapping label to score
+        score_map = {item['label']: item['score'] for item in scores_list}
+        
+        neg_score = score_map.get('LABEL_0', 0.0)
+        neu_score = score_map.get('LABEL_1', 0.0)
+        pos_score = score_map.get('LABEL_2', 0.0)
+        
+        # Determine dominant sentiment
+        if pos_score > neg_score and pos_score > neu_score:
+            sentiment = "positive"
+            confidence = pos_score
+        elif neg_score > pos_score and neg_score > neu_score:
+            sentiment = "negative"
+            confidence = neg_score
+        else:
+            sentiment = "neutral"
+            confidence = neu_score
+            
+        # Calculate compound score (approximate for compatibility)
+        # Formula: (pos - neg) * (1 - neu) ? Or just pos - neg.
+        # Let's use a simple weighted sum normalized to -1 to 1
+        compound = pos_score - neg_score
+        
+        return {
+            "sentiment": sentiment,
+            "confidence": confidence,
+            "positive_score": pos_score,
+            "negative_score": neg_score,
+            "neutral_score": neu_score,
+            "compound_score": compound
+        }
+    
     def analyze_sentiment(self, text: str) -> Dict[str, Any]:
-        """
-        Analyze sentiment using Hugging Face model
-        """
+        """Analyze sentiment of a single text using RoBERTa"""
         try:
-            result = self.client.text_classification(
-                text,
-                model=self.model,
-            )
+            # Truncate text to 512 tokens (approx 2000 chars) to prevent errors
+            truncated_text = text[:2000]
             
-            # Extract scores from result
-            positive_score = 0.0
-            negative_score = 0.0
+            # Pipeline returns a list of lists (because top_k=None)
+            results = self.sentiment_pipeline(truncated_text)
+            scores = results[0]  # Get first (and only) result
             
-            for item in result:
-                if item["label"] == 'POSITIVE':
-                    positive_score = item["score"]
-                elif item["label"] == 'NEGATIVE':
-                    negative_score = item["score"]
-            # Determine sentiment and confidence
-            if positive_score > negative_score:
-                sentiment = "positive"
-                confidence = positive_score
-            else:
-                sentiment = "negative"
-                confidence = negative_score
+            processed = self._process_scores(scores)
+            processed["text"] = text
+            return processed
             
+        except Exception as e:
+            print(f"Error analyzing text: {e}")
+            # Fallback for errors
             return {
                 "text": text,
-                "sentiment": sentiment,
-                "confidence": confidence,
-                "positive_score": positive_score,
-                "negative_score": negative_score
+                "sentiment": "neutral",
+                "confidence": 0.0,
+                "positive_score": 0.0,
+                "negative_score": 0.0,
+                "neutral_score": 0.0,
+                "compound_score": 0.0
             }
-            
-        except Exception as e:
-            raise e
-    
-    def classify_sentiment_batch(self, text: str) -> tuple:
-        """
-        Function to call sentiment analysis for batch processing
-        """
-        try:
-            result = self.client.text_classification(
-                text,
-                model=self.model,
-            )
-            return text, result
-        except Exception as e:
-            return text, f"Error: {e}"
     
     def analyze_sentiment_batch(self, texts: List[str]) -> tuple[List[Dict[str, Any]], int, int]:
-        """
-        Analyze sentiment for multiple texts in parallel batches
-        """
-        start_time = time.time()
-        
+        """Analyze sentiment for multiple texts using RoBERTa"""
         results = []
         successful_count = 0
         failed_count = 0
         
-        with ThreadPoolExecutor(max_workers=500) as executor:
-            future_to_text = {executor.submit(self.classify_sentiment_batch, text): text for text in texts}
-            
-            for i, future in enumerate(as_completed(future_to_text)):
-                text, result = future.result()
-                
-                # Process the result
-                if isinstance(result, str) and result.startswith("Error:"):
-                    # Skip failed API calls - don't include in results
-                    failed_count += 1
-                    continue
-                else:
-                    # Process Hugging Face result
-                    successful_count += 1
-                    positive_score = 0.0
-                    negative_score = 0.0
-                    
-                    for item in result:
-                        if isinstance(item, dict):
-                            label = item.get("label", "")
-                            score = item.get("score", 0.0)
-                            if label == 'POSITIVE':
-                                positive_score = float(score)
-                            elif label == 'NEGATIVE':
-                                negative_score = float(score)
-                    
-                    if positive_score > negative_score:
-                        sentiment = "positive"
-                        confidence = positive_score
-                    else:
-                        sentiment = "negative"
-                        confidence = negative_score
-                    
-                    processed_result = {
-                        "text": text,
-                        "sentiment": sentiment,
-                        "confidence": confidence,
-                        "positive_score": positive_score,
-                        "negative_score": negative_score
-                    }
-                    
-                    results.append(processed_result)
+        # Process in batches to avoid memory issues
+        BATCH_SIZE = 32
         
+        for i in range(0, len(texts), BATCH_SIZE):
+            batch_texts = texts[i:i + BATCH_SIZE]
+            # Truncate all texts
+            truncated_batch = [t[:2000] for t in batch_texts]
+            
+            try:
+                batch_results = self.sentiment_pipeline(truncated_batch)
+                
+                for text, scores in zip(batch_texts, batch_results):
+                    processed = self._process_scores(scores)
+                    processed["text"] = text
+                    results.append(processed)
+                    successful_count += 1
+                    
+            except Exception as e:
+                print(f"Batch processing error: {e}")
+                # If batch fails, try one by one or just mark as failed
+                # For now, mark this batch as failed
+                failed_count += len(batch_texts)
+                
         return results, successful_count, failed_count
 
 class YouTubeService:

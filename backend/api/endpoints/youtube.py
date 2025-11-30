@@ -1,30 +1,46 @@
 from fastapi import APIRouter, HTTPException
 from ..models import YouTubeAnalysisRequest, YouTubeAnalysisResponse, CommentSentiment
-from ..services.sentiment_service import RobertaSentimentService, YouTubeService
+from ..services.sentiment_service import TextBlobSentimentService, YouTubeService
 from typing import List
 
+import logging
+import time
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
-sentiment_service = RobertaSentimentService()
+sentiment_service = TextBlobSentimentService()
 youtube_service = YouTubeService()
 
 @router.post("/youtube/analyze", response_model=YouTubeAnalysisResponse)
-async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
+def analyze_youtube_comments(request: YouTubeAnalysisRequest):
     """
     Analyze sentiment of YouTube video comments
     """
 
     
     try:
+        start_time = time.time()
+        logger.info(f"Starting analysis for URL: {request.video_url}")
+        
         # Extract video ID
         video_id = youtube_service.extract_video_id(request.video_url)
+        logger.info(f"Extracted video ID: {video_id}")
         
         # Get comments
         comments = youtube_service.get_comments(video_id)
+        logger.info(f"Fetched {len(comments)} comments for video {video_id}")
+        
         if not comments:
+            logger.warning(f"No comments found for video {video_id}")
             raise HTTPException(status_code=404, detail="No comments found for this video")
         
         # Analyze sentiment for all comments in batch
+        logger.info(f"Starting batch sentiment analysis for {len(comments)} comments")
         sentiment_results, successful_count, failed_count = sentiment_service.analyze_sentiment_batch(comments)
+        logger.info(f"Analysis complete. Success: {successful_count}, Failed: {failed_count}")
         
         # Process results and separate positive/negative/neutral comments
         positive_comments = []
@@ -84,6 +100,9 @@ async def analyze_youtube_comments(request: YouTubeAnalysisRequest):
         # Get top 10 most positive (highest compound scores)
         top_positive = [item['comment'] for item in reversed(all_results_with_compound) if item['comment'].sentiment == 'positive'][:10]
         
+        total_duration = time.time() - start_time
+        logger.info(f"Total request processed in {total_duration:.2f} seconds")
+
         return YouTubeAnalysisResponse(
             video_id=video_id,
             total_comments=len(comments),

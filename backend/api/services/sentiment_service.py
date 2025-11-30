@@ -2,84 +2,56 @@ import os
 import re
 import time
 from typing import List, Dict, Any
-from transformers import pipeline
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Load .env from parent directory (project root)
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '..', '..', '.env'))
 
-class RobertaSentimentService:
+class TextBlobSentimentService:
     """
-    RoBERTa (Robustly optimized BERT approach) Sentiment Analysis Service
-    Uses 'cardiffnlp/twitter-roberta-base-sentiment' model which is trained on ~58M tweets.
-    
-    Labels:
-    LABEL_0 -> Negative
-    LABEL_1 -> Neutral
-    LABEL_2 -> Positive
+    TextBlob Sentiment Analysis Service
+    Lightweight, rule-based sentiment analysis.
+    Extremely fast compared to Transformer models.
     """
     
     def __init__(self):
-        print("Loading RoBERTa model... this may take a moment")
-        self.sentiment_pipeline = pipeline(
-            "sentiment-analysis",
-            model="cardiffnlp/twitter-roberta-base-sentiment",
-            tokenizer="cardiffnlp/twitter-roberta-base-sentiment",
-            top_k=None  # Return scores for all labels
-        )
-    
-    def _process_scores(self, scores_list: List[Dict[str, float]]) -> Dict[str, Any]:
-        """Helper to process raw model scores into our format"""
-        # Convert list of dicts to a single dict mapping label to score
-        score_map = {item['label']: item['score'] for item in scores_list}
-        
-        neg_score = score_map.get('LABEL_0', 0.0)
-        neu_score = score_map.get('LABEL_1', 0.0)
-        pos_score = score_map.get('LABEL_2', 0.0)
-        
-        # Determine dominant sentiment
-        if pos_score > neg_score and pos_score > neu_score:
-            sentiment = "positive"
-            confidence = pos_score
-        elif neg_score > pos_score and neg_score > neu_score:
-            sentiment = "negative"
-            confidence = neg_score
-        else:
-            sentiment = "neutral"
-            confidence = neu_score
-            
-        # Calculate compound score (approximate for compatibility)
-        # Formula: (pos - neg) * (1 - neu) ? Or just pos - neg.
-        # Let's use a simple weighted sum normalized to -1 to 1
-        compound = pos_score - neg_score
-        
-        return {
-            "sentiment": sentiment,
-            "confidence": confidence,
-            "positive_score": pos_score,
-            "negative_score": neg_score,
-            "neutral_score": neu_score,
-            "compound_score": compound
-        }
+        print("Initializing TextBlob service...")
+        from textblob import TextBlob
+        # TextBlob doesn't need heavy model loading
     
     def analyze_sentiment(self, text: str) -> Dict[str, Any]:
-        """Analyze sentiment of a single text using RoBERTa"""
+        """Analyze sentiment of a single text using TextBlob"""
+        from textblob import TextBlob
+        
         try:
-            # Truncate text to 512 tokens (approx 2000 chars) to prevent errors
-            truncated_text = text[:2000]
+            blob = TextBlob(text)
+            polarity = blob.sentiment.polarity
             
-            # Pipeline returns a list of lists (because top_k=None)
-            results = self.sentiment_pipeline(truncated_text)
-            scores = results[0]  # Get first (and only) result
-            
-            processed = self._process_scores(scores)
-            processed["text"] = text
-            return processed
-            
+            if polarity > 0.1:
+                sentiment = "positive"
+                confidence = polarity
+            elif polarity < -0.1:
+                sentiment = "negative"
+                confidence = abs(polarity)
+            else:
+                sentiment = "neutral"
+                confidence = 1.0 - abs(polarity)
+                
+            return {
+                "text": text,
+                "sentiment": sentiment,
+                "confidence": confidence,
+                "positive_score": polarity if polarity > 0 else 0,
+                "negative_score": abs(polarity) if polarity < 0 else 0,
+                "neutral_score": 1.0 - abs(polarity),
+                "compound_score": polarity
+            }
         except Exception as e:
             print(f"Error analyzing text: {e}")
-            # Fallback for errors
             return {
                 "text": text,
                 "sentiment": "neutral",
@@ -91,34 +63,60 @@ class RobertaSentimentService:
             }
     
     def analyze_sentiment_batch(self, texts: List[str]) -> tuple[List[Dict[str, Any]], int, int]:
-        """Analyze sentiment for multiple texts using RoBERTa"""
+        """Analyze sentiment for multiple texts using TextBlob"""
+        from textblob import TextBlob
+        
+        start_time = time.time()
         results = []
         successful_count = 0
         failed_count = 0
         
-        # Process in batches to avoid memory issues
-        BATCH_SIZE = 32
+        # TextBlob is fast enough to process all comments without sampling
+        # 10k comments takes ~1-2 seconds
         
-        for i in range(0, len(texts), BATCH_SIZE):
-            batch_texts = texts[i:i + BATCH_SIZE]
-            # Truncate all texts
-            truncated_batch = [t[:2000] for t in batch_texts]
-            
+        for text in texts:
             try:
-                batch_results = self.sentiment_pipeline(truncated_batch)
+                blob = TextBlob(text)
+                polarity = blob.sentiment.polarity  # -1.0 to 1.0
+                subjectivity = blob.sentiment.subjectivity  # 0.0 to 1.0
                 
-                for text, scores in zip(batch_texts, batch_results):
-                    processed = self._process_scores(scores)
-                    processed["text"] = text
-                    results.append(processed)
-                    successful_count += 1
-                    
+                # Map polarity to our format
+                if polarity > 0.1:
+                    sentiment = "positive"
+                    confidence = polarity
+                    pos_score = polarity
+                    neg_score = 0.0
+                    neu_score = 1.0 - polarity
+                elif polarity < -0.1:
+                    sentiment = "negative"
+                    confidence = abs(polarity)
+                    pos_score = 0.0
+                    neg_score = abs(polarity)
+                    neu_score = 1.0 - abs(polarity)
+                else:
+                    sentiment = "neutral"
+                    confidence = 1.0 - abs(polarity)
+                    pos_score = 0.0
+                    neg_score = 0.0
+                    neu_score = 1.0
+                
+                results.append({
+                    "text": text,
+                    "sentiment": sentiment,
+                    "confidence": confidence,
+                    "positive_score": pos_score,
+                    "negative_score": neg_score,
+                    "neutral_score": neu_score,
+                    "compound_score": polarity  # Use polarity as compound score
+                })
+                successful_count += 1
+                
             except Exception as e:
-                print(f"Batch processing error: {e}")
-                # If batch fails, try one by one or just mark as failed
-                # For now, mark this batch as failed
-                failed_count += len(batch_texts)
+                logger.error(f"Error analyzing text: {e}")
+                failed_count += 1
                 
+        total_duration = time.time() - start_time
+        logger.info(f"Total sentiment analysis took {total_duration:.2f} seconds for {len(texts)} comments")
         return results, successful_count, failed_count
 
 class YouTubeService:
@@ -156,6 +154,10 @@ class YouTubeService:
 
             # Handle pagination
             while 'nextPageToken' in response:
+                if len(comments) >= 10000:
+                    logger.warning("Reached 10,000 comment limit, stopping fetch.")
+                    break
+                    
                 response = self.youtube.commentThreads().list(
                     part='snippet',
                     videoId=video_id,
@@ -166,12 +168,19 @@ class YouTubeService:
                 for item in response['items']:
                     comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
                     comments.append(comment)
+                
+                if len(comments) % 1000 == 0:
+                    logger.info(f"Fetched {len(comments)} comments so far...")
 
         except Exception as e:
+            logger.error(f"Error fetching comments: {e}")
             raise e
 
         
         # Sort comments for consistency between runs
         comments.sort()
+        
+        duration = time.time() - start_time
+        logger.info(f"Fetching {len(comments)} comments took {duration:.2f} seconds")
 
         return comments 

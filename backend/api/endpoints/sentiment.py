@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from ..models import SentimentRequest, SentimentResponse
-from ..services.sentiment_service import RobertaSentimentService
+from ..services.sentiment_service import TextBlobSentimentService
 
 router = APIRouter()
-sentiment_service = RobertaSentimentService()
+sentiment_service = TextBlobSentimentService()
 
 @router.post("/sentiment", response_model=SentimentResponse)
 async def analyze_sentiment(request: SentimentRequest):

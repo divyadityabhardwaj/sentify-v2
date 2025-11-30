@@ -3,7 +3,13 @@
 import { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Youtube, Play, TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
+import {
+  Youtube,
+  Play,
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+} from "lucide-react";
 
 interface CommentAnalysis {
   text: string;
@@ -132,7 +138,7 @@ export default function YouTubeAnalysis() {
                   {result.video_id}
                 </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
                     Total Comments
@@ -140,26 +146,6 @@ export default function YouTubeAnalysis() {
                   <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#2a2a2a]">
                     <span className="text-2xl font-bold gradient-text">
                       {result.total_comments}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
-                    Processed
-                  </label>
-                  <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#2a2a2a]">
-                    <span className="text-2xl font-bold text-[#06b6d4]">
-                      {result.processed_comments}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
-                    Failed
-                  </label>
-                  <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#2a2a2a]">
-                    <span className="text-2xl font-bold text-[#f97316]">
-                      {result.failed_comments}
                     </span>
                   </div>
                 </div>
@@ -178,7 +164,9 @@ export default function YouTubeAnalysis() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-[#06b6d4]" />
-                    <span className="text-[#a0a0a0] text-sm font-medium">Positive</span>
+                    <span className="text-[#a0a0a0] text-sm font-medium">
+                      Positive
+                    </span>
                   </div>
                   <span className="text-[#06b6d4] text-sm font-semibold">
                     {result.positive_percentage.toFixed(1)}%
@@ -200,7 +188,9 @@ export default function YouTubeAnalysis() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <TrendingDown className="w-5 h-5 text-[#f97316]" />
-                    <span className="text-[#a0a0a0] text-sm font-medium">Negative</span>
+                    <span className="text-[#a0a0a0] text-sm font-medium">
+                      Negative
+                    </span>
                   </div>
                   <span className="text-[#f97316] text-sm font-semibold">
                     {result.negative_percentage.toFixed(1)}%
@@ -223,10 +213,16 @@ export default function YouTubeAnalysis() {
             {/* Overall Sentiment */}
             <div className="mt-6 text-center p-4 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a]">
               <div className="text-4xl mb-2">
-                {result.positive_percentage > result.negative_percentage ? "😊" : "😞"}
+                {result.positive_percentage > result.negative_percentage
+                  ? "😊"
+                  : "😞"}
               </div>
               <div className="text-sm text-[#a0a0a0]">
-                Overall {result.positive_percentage > result.negative_percentage ? "Positive" : "Negative"} Sentiment
+                Overall{" "}
+                {result.positive_percentage > result.negative_percentage
+                  ? "Positive"
+                  : "Negative"}{" "}
+                Sentiment
               </div>
             </div>
           </div>

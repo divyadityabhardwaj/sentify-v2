@@ -75,9 +75,5 @@ export function TextScramble({
     scramble();
   }, [trigger]);
 
-  return (
-    <MotionComponent className={className} {...props}>
-      {displayText}
-    </MotionComponent>
-  );
+  return <MotionComponent {...props}>{displayText}</MotionComponent>;
 }

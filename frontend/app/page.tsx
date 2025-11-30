@@ -9,12 +9,12 @@ import YouTubeAnalysis from "./components/YouTubeAnalysis";
 import {
   Navbar,
   NavBody,
-  NavItems,
   NavbarLogo,
   MobileNav,
   MobileNavHeader,
   MobileNavToggle,
   MobileNavMenu,
+  NavbarButton,
 } from "./components/Navbar";
 
 import AnimatedGradientBackground from "./components/ui/animated-gradient-background";
@@ -38,13 +38,6 @@ export default function Home() {
   >("checking");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<AnalysisTab>("text");
-
-  const navItems = [
-    { name: "Home", link: "#" },
-    { name: "Features", link: "#features" },
-    { name: "Pricing", link: "#pricing" },
-    { name: "Contact", link: "#contact" },
-  ];
 
   useEffect(() => {
     // Check backend health on mount
@@ -94,7 +87,9 @@ export default function Home() {
       <Navbar>
         <NavBody>
           <NavbarLogo />
-          <NavItems items={navItems} />
+          <NavbarButton onClick={scrollToApp} variant="gradient">
+            Try Sentify
+          </NavbarButton>
         </NavBody>
         <MobileNav>
           <MobileNavHeader>
@@ -108,10 +103,18 @@ export default function Home() {
             isOpen={isMobileMenuOpen}
             onClose={() => setIsMobileMenuOpen(false)}
           >
-            <NavItems
-              items={navItems}
-              className="flex flex-col space-x-0 space-y-4"
-            />
+            <div className="flex flex-col items-start space-y-4 w-full">
+              <NavbarButton
+                onClick={() => {
+                  scrollToApp();
+                  setIsMobileMenuOpen(false);
+                }}
+                variant="gradient"
+                className="w-full"
+              >
+                Try Sentify
+              </NavbarButton>
+            </div>
           </MobileNavMenu>
         </MobileNav>
       </Navbar>
@@ -220,7 +223,7 @@ export default function Home() {
             className="mt-16 text-center text-sm text-[#6b6b6b]"
           >
             <p>
-              Powered by RoBERTa Sentiment Analysis & YouTube API • Built with
+              Powered by Advanced Sentiment Analysis & YouTube API • Built with
               Next.js & FastAPI
             </p>
           </motion.div>

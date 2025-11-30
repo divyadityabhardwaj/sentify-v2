@@ -97,7 +97,7 @@ export default function YouTubeAnalysis() {
             disabled={loading}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] text-white font-semibold rounded-lg hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:ring-offset-2 focus:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2"
+            className="px-6 py-3 bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:ring-offset-2 focus:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3),0_4px_0_rgba(0,0,0,0.2),0_8px_16px_rgba(0,0,0,0.4)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5),0_4px_0_rgba(0,0,0,0.2),0_12px_24px_rgba(0,0,0,0.5)] active:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3),0_0_0_rgba(0,0,0,0.2),0_2px_4px_rgba(0,0,0,0.4)] active:translate-y-1"
           >
             {loading ? (
               <>

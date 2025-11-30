@@ -255,9 +255,6 @@ export const NavbarLogo = () => {
       href="#"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-white"
     >
-      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-        <span className="text-black font-bold text-sm">S</span>
-      </div>
       <span className={cn("font-medium", "text-white")}>Sentify</span>
     </a>
   );
@@ -290,7 +287,7 @@ export const NavbarButton = ({
       "bg-transparent text-black border border-black/20 hover:bg-black/5 dark:text-black dark:border-black/20 dark:hover:bg-black/5 rounded-full",
     dark: "bg-text text-black hover:bg-text/90 rounded-full shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08)]",
     gradient:
-      "bg-gradient-to-b from-primary to-primary-600 text-white rounded-full shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
+      "bg-gradient-to-b from-primary to-primary-600 text-white rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3),0_4px_0_rgba(0,0,0,0.2),0_8px_16px_rgba(0,0,0,0.4)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5),0_4px_0_rgba(0,0,0,0.2),0_12px_24px_rgba(0,0,0,0.5)] active:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3),0_0_0_rgba(0,0,0,0.2),0_2px_4px_rgba(0,0,0,0.4)] active:translate-y-1",
   };
 
   return (

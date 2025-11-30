@@ -41,7 +41,7 @@ export default function HeroSection({ onStartClick }: HeroSectionProps) {
           transition={{ delay: 1.5, duration: 0.8 }}
           className="text-lg md:text-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed font-light"
         >
-          Advanced AI-powered sentiment analysis for text and YouTube comments.
+          Advanced sentiment analysis for text and YouTube comments.
         </motion.div>
 
         <motion.div
@@ -54,7 +54,7 @@ export default function HeroSection({ onStartClick }: HeroSectionProps) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onStartClick}
-            className="group px-10 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-100 transition-all duration-300 flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+            className="group px-10 py-4 bg-white text-black rounded-full font-bold text-lg transition-all duration-300 flex items-center gap-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3),0_4px_0_rgba(200,200,200,1),0_8px_16px_rgba(0,0,0,0.4)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5),0_4px_0_rgba(200,200,200,1),0_12px_24px_rgba(0,0,0,0.5)] active:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3),0_0_0_rgba(200,200,200,1),0_2px_4px_rgba(0,0,0,0.4)] active:translate-y-1"
           >
             Start Analyzing
           </motion.button>

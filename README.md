@@ -1,12 +1,12 @@
 # Sentify v2 🚀
 
-A powerful sentiment analysis application with **Hugging Face AI models** and **YouTube comment analysis**. Built with Python FastAPI backend and Next.js frontend, designed for deployment on Vercel.
+A powerful sentiment analysis application with **TextBlob** and **YouTube comment analysis**. Built with Python FastAPI backend and Next.js frontend, designed for deployment on Vercel.
 
 ## ✨ Features
 
 ### 🧠 **Advanced Sentiment Analysis**
 
-- **RoBERTa Sentiment Analysis**: Robustly optimized BERT approach for state-of-the-art accuracy
+- **TextBlob Sentiment Analysis**: Fast and efficient rule-based sentiment analysis
 - **Lightning Fast**: Processes 1000s of texts per second locally
 - **High Accuracy**: 85-90% accuracy, optimized for social media text
 - **Real-time Processing**: Instant analysis with confidence scores
@@ -46,7 +46,7 @@ sentify-v2/
 │   │   │   ├── sentiment.py # Text sentiment analysis
 │   │   │   └── youtube.py # YouTube comment analysis
 │   │   ├── services/      # Business logic services
-│   │   │   └── sentiment_service.py # RoBERTa & YouTube services
+│   │   │   └── sentiment_service.py # TextBlob & YouTube services
 │   │   ├── models.py      # Pydantic data models
 │   │   └── index.py       # Main FastAPI app
 │   └── requirements.txt   # Python dependencies
@@ -85,7 +85,7 @@ YOUTUBE_API_KEY=your_youtube_api_key_here
 BACKEND_URL=http://localhost:8000
 ```
 
-**Note**: No Hugging Face API key needed! RoBERTa runs locally.
+**Note**: No API key needed! TextBlob runs locally.
 
 ### 3. Install Dependencies
 
@@ -120,7 +120,7 @@ chmod +x start-dev.sh
 
 ### ~~Hugging Face API Key~~ (No Longer Needed!)
 
-We now use RoBERTa for sentiment analysis, which runs locally and requires no API key!
+We now use TextBlob for sentiment analysis, which runs locally and requires no API key!
 
 ## 📊 API Endpoints
 
@@ -186,7 +186,7 @@ YOUTUBE_API_KEY=your_youtube_api_key
 BACKEND_URL=https://your-backend-url.vercel.app
 ```
 
-**Note**: No Hugging Face API key needed!
+**Note**: No API key needed!
 
 ## 🎯 Usage Examples
 
@@ -225,7 +225,7 @@ Output:
 
 **"Sentiment analysis error"**
 
-- RoBERTa runs locally, so no API issues
+- TextBlob runs locally, so no API issues
 - Check if text is valid and not empty
 - Ensure backend is running properly
 
@@ -257,7 +257,7 @@ Output:
 
 ## 🙏 Acknowledgments
 
-- **RoBERTa Sentiment Analysis** for state-of-the-art, context-aware sentiment analysis
+- **TextBlob** for fast and efficient sentiment analysis
 - **YouTube Data API** for comment extraction
 - **FastAPI** for the robust backend framework
 - **Next.js** for the modern frontend framework

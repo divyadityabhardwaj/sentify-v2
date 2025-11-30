@@ -19,13 +19,13 @@ export default function HeroSection({ onStartClick }: HeroSectionProps) {
       >
         <div className="mb-8 flex flex-col items-center gap-2">
           <h2 className="text-xl md:text-2xl font-medium text-blue-200 tracking-widest uppercase mb-2">
-            <TextScramble duration={2.5} speed={0.08} trigger={true}>
+            <TextScramble duration={1.5} speed={0.1} trigger={true}>
               Decode Sentiment
             </TextScramble>
           </h2>
           <h1 className="text-6xl md:text-9xl font-black text-white tracking-tighter drop-shadow-lg">
             <TextScramble
-              duration={3}
+              duration={2}
               speed={0.1}
               trigger={true}
               className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80"

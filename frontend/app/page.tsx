@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Brain, ArrowDown, FileText, Youtube } from "lucide-react";
+import { Brain, ArrowDown, FileText, Youtube, Github } from "lucide-react";
 import TextAnalysis from "./components/TextAnalysis";
 import YouTubeAnalysis from "./components/YouTubeAnalysis";
 import {
@@ -222,10 +222,17 @@ export default function Home() {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="mt-16 text-center text-sm text-[#6b6b6b]"
           >
-            <p>
-              Powered by Advanced Sentiment Analysis & YouTube API • Built with
-              Next.js & FastAPI
-            </p>
+            <div className="flex items-center justify-center gap-2">
+              <p>Built with Next.js & FastAPI by Divyaditya Bhardwaj</p>
+              <a
+                href="https://github.com/divyadityabhardwaj"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#a0a0a0] hover:text-white transition-colors"
+              >
+                <Github className="w-4 h-4" />
+              </a>
+            </div>
           </motion.div>
         </div>
       </section>

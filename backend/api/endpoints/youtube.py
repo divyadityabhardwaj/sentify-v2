@@ -11,8 +11,20 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-sentiment_service = TextBlobSentimentService()
-youtube_service = YouTubeService()
+_sentiment_service = None
+_youtube_service = None
+
+def get_sentiment_service():
+    global _sentiment_service
+    if _sentiment_service is None:
+        _sentiment_service = TextBlobSentimentService()
+    return _sentiment_service
+
+def get_youtube_service():
+    global _youtube_service
+    if _youtube_service is None:
+        _youtube_service = YouTubeService()
+    return _youtube_service
 
 @router.post("/youtube/analyze", response_model=YouTubeAnalysisResponse)
 def analyze_youtube_comments(request: YouTubeAnalysisRequest):
@@ -26,11 +38,11 @@ def analyze_youtube_comments(request: YouTubeAnalysisRequest):
         logger.info(f"Starting analysis for URL: {request.video_url}")
         
         # Extract video ID
-        video_id = youtube_service.extract_video_id(request.video_url)
+        video_id = get_youtube_service().extract_video_id(request.video_url)
         logger.info(f"Extracted video ID: {video_id}")
         
         # Get comments
-        comments = youtube_service.get_comments(video_id)
+        comments = get_youtube_service().get_comments(video_id)
         logger.info(f"Fetched {len(comments)} comments for video {video_id}")
         
         if not comments:
@@ -39,7 +51,7 @@ def analyze_youtube_comments(request: YouTubeAnalysisRequest):
         
         # Analyze sentiment for all comments in batch
         logger.info(f"Starting batch sentiment analysis for {len(comments)} comments")
-        sentiment_results, successful_count, failed_count = sentiment_service.analyze_sentiment_batch(comments)
+        sentiment_results, successful_count, failed_count = get_sentiment_service().analyze_sentiment_batch(comments)
         logger.info(f"Analysis complete. Success: {successful_count}, Failed: {failed_count}")
         
         # Process results and separate positive/negative/neutral comments

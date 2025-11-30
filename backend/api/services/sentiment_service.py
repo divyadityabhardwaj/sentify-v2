@@ -20,6 +20,22 @@ class TextBlobSentimentService:
     
     def __init__(self):
         print("Initializing TextBlob service...")
+        import nltk
+        
+        # Vercel file system is read-only except for /tmp
+        # We need to ensure NLTK data is downloaded to /tmp
+        nltk_data_path = "/tmp/nltk_data"
+        if not os.path.exists(nltk_data_path):
+            os.makedirs(nltk_data_path, exist_ok=True)
+        
+        nltk.data.path.append(nltk_data_path)
+        
+        try:
+            nltk.data.find('tokenizers/punkt')
+        except LookupError:
+            print(f"Downloading punkt tokenizer to {nltk_data_path}...")
+            nltk.download('punkt', download_dir=nltk_data_path)
+            
         from textblob import TextBlob
         # TextBlob doesn't need heavy model loading
     

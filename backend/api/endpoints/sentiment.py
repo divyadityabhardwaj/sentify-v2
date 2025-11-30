@@ -3,7 +3,13 @@ from ..models import SentimentRequest, SentimentResponse
 from ..services.sentiment_service import TextBlobSentimentService
 
 router = APIRouter()
-sentiment_service = TextBlobSentimentService()
+_sentiment_service = None
+
+def get_sentiment_service():
+    global _sentiment_service
+    if _sentiment_service is None:
+        _sentiment_service = TextBlobSentimentService()
+    return _sentiment_service
 
 @router.post("/sentiment", response_model=SentimentResponse)
 async def analyze_sentiment(request: SentimentRequest):
@@ -12,7 +18,8 @@ async def analyze_sentiment(request: SentimentRequest):
     """
     
     try:
-        result = sentiment_service.analyze_sentiment(request.text)
+        service = get_sentiment_service()
+        result = service.analyze_sentiment(request.text)
                 
         return SentimentResponse(
             text=result['text'],

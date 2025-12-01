@@ -10,12 +10,12 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onStartClick }: HeroSectionProps) {
   return (
-    <div className="relative z-20 flex flex-col items-center justify-center min-h-[60vh] max-w-5xl mx-auto px-4">
+    <div className="relative z-20 flex flex-col items-center justify-center min-h-[70vh] w-[70%] min-w-[70vw] mx-auto px-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8 }}
-        className="relative z-10 text-center p-8 md:p-16 rounded-3xl bg-black/40 backdrop-blur-md border border-white/10 shadow-2xl"
+        className="relative z-10 w-full text-center p-8 md:p-16 rounded-3xl bg-black/40 backdrop-blur-md border border-white/10 shadow-2xl"
       >
         <div className="mb-8 flex flex-col items-center gap-2">
           <h2 className="text-xl md:text-2xl font-medium text-blue-200 tracking-widest uppercase mb-2">
@@ -41,7 +41,7 @@ export default function HeroSection({ onStartClick }: HeroSectionProps) {
           transition={{ delay: 1.5, duration: 0.8 }}
           className="text-lg md:text-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed font-light"
         >
-          Advanced sentiment analysis for text and YouTube comments.
+          Sentiment analysis for text and YouTube comments.
         </motion.div>
 
         <motion.div
